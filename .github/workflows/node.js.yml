@@ -1,4 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code, and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
 name: Node.js CI
@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -29,3 +28,33 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+
+  deployment:
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: SSH SETUP
+      env:
+        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
+        SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+        ENV: ${{ secrets.ENV }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP}
+          set -e
+          WORKSPACE=$HOME/trust_claim_backend
+          if [ ! -d "$WORKSPACE" ]; then
+            echo "Directory $WORKSPACE does not exist. Creating it..."
+            mkdir -p $WORKSPACE
+          fi
+          cd $WORKSPACE
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
+          else
+            git pull origin master
+          fi
+          touch .env
+          echo "${ENV}" > .env
+          bash deploy.sh
