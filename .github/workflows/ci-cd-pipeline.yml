@@ -28,10 +28,10 @@ jobs:
             WORKSPACE=/data/trust_claim_backend
             if [ ! -d "$WORKSPACE" ]; then
               echo "Directory $WORKSPACE does not exist. Creating it..."
-              mkdir -p $WORKSPACE
+              sudo mkdir -p $WORKSPACE
             fi
             cd $WORKSPACE
-            git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
-            touch .env
-            echo "${{ secrets.ENV }}" > .env
-            bash deploy.sh
+            sudo git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
+            sudo touch .env
+            sudo echo "${{ secrets.ENV }}" > .env
+            sudo bash deploy.sh
