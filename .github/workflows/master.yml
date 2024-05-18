@@ -1,27 +1,41 @@
-# .github/workflows/ci-cd-pipeline.yml
-
-name: CI/CD Trustclaim Backend
+name: Continuous Integration
 
 on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
+
+concurrency:
+  group: master
+  cancel-in-progress: true
 
 jobs:
-  Deployment:
+  quality-assurance:
+    name: Quality Assurance
+    uses: ./.github/workflows/njsscan.yml
+
+  deploy:
+    name: Deploy
+    needs: quality-assurance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: BUSINESS LOGIC
+      - name: Configure SSH
         env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
-          PUBLIC_IP: ${{ secrets.PUBLIC_IP  }}
-          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME  }}
+          SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.PUBLIC_IP }}
+          SSH_USER: ${{ secrets.SERVER_USERNAME }}
         run: |
-          pwd
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP} 
-          pwd && whoami 
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
+          chmod 600 ~/.ssh/github
+          cat >>~/.ssh/config <<END
+          Host target
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/github
+            LogLevel ERROR
+            StrictHostKeyChecking no
+          END
+      - name: Run deploy
+        run: |
+          ssh target "cd /data/trust_claim_backend && git pull origin master && pwd && whoami"
