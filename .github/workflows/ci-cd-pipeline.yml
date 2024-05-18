@@ -31,5 +31,5 @@ jobs:
               sudo mkdir -p $WORKSPACE
             fi
             cd $WORKSPACE
-            git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
-            bash deploy.sh
+            sudo git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
+            sudo bash deploy.sh
