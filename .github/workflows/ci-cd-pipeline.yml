@@ -1,5 +1,3 @@
-# .github/workflows/ci-cd-pipeline.yml
-
 name: CI/CD Trustclaim Backend
 
 on:
@@ -10,26 +8,34 @@ on:
     branches:
       - master
 
+concurrency:
+  group: master
+  cancel-in-progress: true
+
 jobs:
-  Deployment:
+
+
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.PUBLIC_IP }} >> ~/.ssh/known_hosts
-
-      - name: Git pull and deploy
+      - name: Configure SSH
         env:
-          PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
-          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.PUBLIC_IP }}
+          SSH_USER: ${{ secrets.SERVER_USERNAME }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SERVER_USERNAME }}@${{ secrets.PUBLIC_IP }} << 'EOF'
-            cd ${WORKSPACE}
-            git pull
-            bash deploy.sh
+          mkdir -p ~/.ssh/
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
+          chmod 600 ~/.ssh/github
+          cat >>~/.ssh/config <<END
+          Host target
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/github
+            LogLevel ERROR
+            StrictHostKeyChecking no
+          END
+      - name: Run deploy
+        run: |
+          ssh target "cd ${WORKSPACE} && bash deploy.sh"
