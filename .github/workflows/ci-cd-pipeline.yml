@@ -28,7 +28,7 @@ jobs:
             WORKSPACE=/data/trust_claim_backend
             if [ ! -d "$WORKSPACE" ]; then
               echo "Directory $WORKSPACE does not exist. Creating it..."
-              mkdir -p $WORKSPACE
+              sudo mkdir -p $WORKSPACE
             fi
             cd $WORKSPACE
             bash deploy.sh
