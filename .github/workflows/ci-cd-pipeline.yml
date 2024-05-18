@@ -24,4 +24,4 @@ jobs:
           pwd
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP} 
-          cd ${WORKSPACE} && bash deploy.sh
+          cd ${WORKSPACE} && cd /data/trust_claim_backend && bash deploy.sh
