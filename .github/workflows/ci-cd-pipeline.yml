@@ -20,7 +20,6 @@ jobs:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
           PUBLIC_IP: ${{ secrets.PUBLIC_IP  }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME  }}
-          WORKSPACE : ${{ secrets.WORKSPACE }}
         run: |
           pwd
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
