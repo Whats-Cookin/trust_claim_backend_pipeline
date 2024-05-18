@@ -12,7 +12,7 @@ on:
 
 jobs:
   Deployment:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: SSH SETUP
@@ -24,9 +24,9 @@ jobs:
         run: |
           pwd
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP} 
+          ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP}
             set -e
-            WORKSPACE=/data/trust_claim_backend
+            WORKSPACE=$HOME/trust_claim_backend
             if [ ! -d "$WORKSPACE" ]; then
               echo "Directory $WORKSPACE does not exist. Creating it..."
               mkdir -p $WORKSPACE
