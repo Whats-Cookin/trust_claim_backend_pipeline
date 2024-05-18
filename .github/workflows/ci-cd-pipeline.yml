@@ -32,6 +32,6 @@ jobs:
             fi
             cd $WORKSPACE
             sudo git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
-            touch .env
-            echo "${{ secrets.ENV }}" > .env
+            sudo touch .env
+            sudo echo "${{ secrets.ENV }}" > .env
             sudo bash deploy.sh
