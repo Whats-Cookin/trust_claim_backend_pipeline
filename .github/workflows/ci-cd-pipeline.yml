@@ -33,3 +33,4 @@ jobs:
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -vvv -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP} << 'EOF'
             cd ${WORKSPACE} && bash deploy.sh
+EOF
