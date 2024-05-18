@@ -1,5 +1,7 @@
 # install and deploy backend
+git pull origin master
 npm i
+npm audit fix --force
 
 echo "\n\nInstalled Backend Requirements.. generating artifacts"
 npx prisma generate
