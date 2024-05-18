@@ -12,10 +12,10 @@ on:
 
 jobs:
   Deployment:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Git pull
+      - name: SSH SETUP
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
@@ -31,4 +31,5 @@ jobs:
               sudo mkdir -p $WORKSPACE
             fi
             cd $WORKSPACE
+            git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
             bash deploy.sh
