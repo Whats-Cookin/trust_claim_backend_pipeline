@@ -36,6 +36,6 @@ jobs:
             LogLevel ERROR
             StrictHostKeyChecking no
           END
-      - name: Run deploy
+      - name: Pull and Deploy Changes
         run: |
-          ssh target "cd ${WORKSPACE} && bash deploy.sh"
+          ssh target "cd /data/trust_claim_backend && git pull origin master && npm i  && npm audit fix --force && npx prisma generate && npx prisma migrate deploy && npm run build && sudo sudo systemctl restart nginx"
