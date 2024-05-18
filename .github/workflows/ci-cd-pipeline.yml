@@ -17,11 +17,18 @@ jobs:
       - uses: actions/checkout@v2
       - name: Git pull
         env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
-          PUBLIC_IP: ${{ secrets.PUBLIC_IP  }}
-          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME  }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
         run: |
           pwd
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP} 
-          cd ${WORKSPACE} && cd /data/trust_claim_backend && bash deploy.sh
+            set -e
+            WORKSPACE=/data/trust_claim_backend
+            if [ ! -d "$WORKSPACE" ]; then
+              echo "Directory $WORKSPACE does not exist. Creating it..."
+              mkdir -p $WORKSPACE
+            fi
+            cd $WORKSPACE
+            bash deploy.sh
