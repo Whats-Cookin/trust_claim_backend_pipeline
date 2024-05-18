@@ -18,16 +18,16 @@ jobs:
 
       - name: Debug environment variables
         run: |
-          echo "PRIVATE_KEY is set: ${PRIVATE_KEY:+yes}"
-          echo "PUBLIC_IP is set: ${PUBLIC_IP:+yes}"
-          echo "SERVER_USERNAME is set: ${SERVER_USERNAME:+yes}"
+          echo "PRIVATE_KEY is set: ${{secrets.PRIVATE_KEY}}"
+          echo "PUBLIC_IP is set: ${{ secrets.PUBLIC_IP }}"
+          echo "SERVER_USERNAME is set: ${{ secrets.SERVER_USERNAME }}"
 
       - name: Git pull
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
           SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-          WORKSPACE: ${{ github.workspace }}
+          WORKSPACE: "/data/trust_claim_backend/"
         run: |
           pwd
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
