@@ -12,31 +12,16 @@ on:
 
 jobs:
   Deployment:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: SSH SETUP
+      - name: Git pull
         env:
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
-          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
-          ENV: ${{ secrets.ENV }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY  }}
+          PUBLIC_IP: ${{ secrets.PUBLIC_IP  }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME  }}
         run: |
           pwd
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP}
-            set -e
-            WORKSPACE=$HOME/trust_claim_backend
-            if [ ! -d "$WORKSPACE" ]; then
-              echo "Directory $WORKSPACE does not exist. Creating it..."
-              mkdir -p $WORKSPACE
-            fi
-            cd $WORKSPACE
-            if [ ! -d ".git" ]; then
-              git clone https://github.com/Whats-Cookin/trust_claim_backend.git .
-            else
-              git pull origin master
-            fi
-            touch .env
-            echo "${ENV}" > .env
-            bash deploy.sh
+          ssh -o StrictHostKeyChecking=no -i private_key ${SERVER_USERNAME}@${PUBLIC_IP} 
+          cd ${WORKSPACE} && pwd
