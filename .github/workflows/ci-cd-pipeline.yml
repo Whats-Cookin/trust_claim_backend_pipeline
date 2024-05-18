@@ -1,3 +1,5 @@
+# .github/workflows/ci-cd-pipeline.yml
+
 name: CI/CD Trustclaim Backend
 
 on:
@@ -13,12 +15,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Configure SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
@@ -26,16 +29,10 @@ jobs:
           SSH_USER: ${{ secrets.SERVER_USERNAME }}
         run: |
           mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
-          chmod 600 ~/.ssh/github
-          cat >>~/.ssh/config <<END
-          Host target
-            HostName $SSH_HOST
-            User $SSH_USER
-            IdentityFile ~/.ssh/github
-            LogLevel ERROR
-            StrictHostKeyChecking no
-          END
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo -e "Host target\n  HostName $SSH_HOST\n  User $SSH_USER\n  IdentityFile ~/.ssh/id_rsa\n  LogLevel ERROR\n  StrictHostKeyChecking no" > ~/.ssh/config
+
       - name: Pull and Deploy Changes
         run: |
-          ssh target "cd /data/trust_claim_backend && git pull origin master && npm i  && npm audit fix --force && npx prisma generate && npx prisma migrate deploy && npm run build && sudo sudo systemctl restart nginx"
+          ssh target "cd /data/trust_claim_backend && git pull origin master && npm i && npm audit fix --force && npx prisma generate && npx prisma migrate deploy && npm run build && sudo systemctl restart nginx"
