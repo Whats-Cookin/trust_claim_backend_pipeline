@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: BUSINESS LOGIC
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
@@ -30,7 +30,7 @@ jobs:
     - run: npm test
 
   deployment:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
